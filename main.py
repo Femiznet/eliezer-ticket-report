@@ -12,12 +12,19 @@ def main():
     print("Fetching data...")
     data = fetch_data_with_args(args)
 
+    if not data:
+        print("No data to process")
+        exit(0)
+    
     # process data and get tickets by allowed owners
     allowed_owners = set(owner.strip() for owner in OWNERS.split(","))
-    print(allowed_owners)
-
+    
     print("Processing tickets...")
     processed_tickets = process_tickets(data, allowed_owners)
+
+    if not process_tickets:
+        print("No tickets to export as excel")
+        exit(0)
 
     # convert to excel
     print("Generating excel...")

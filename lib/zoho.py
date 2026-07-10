@@ -13,7 +13,7 @@ class ZohoAPI:
         self.session = requests.Session()
         self.timeout = timeout
     
-    def _handle_request(self, method, url, **kwargs) -> dict:
+    def _handle_request(self, method, url, **kwargs) -> dict | int:
         """Unified internal function to share error handling and request logic."""
         kwargs.setdefault("timeout", self.timeout)
         try:
@@ -21,7 +21,7 @@ class ZohoAPI:
             if method == "GET" and response.status_code == 401:
                 return 401
             response.raise_for_status()
-            return response.json()
+            return response.json() or {}
         except requests.exceptions.JSONDecodeError as e:
             log_error("Invalid JSON response from API", e)
             return {}
@@ -40,7 +40,7 @@ class ZohoAPI:
 
     def request_data(self, url, params, headers) -> list:
         data = self._handle_request(method="GET", url=url, params=params, headers=headers)
-        return data.get("data") if isinstance(data, dict) else data
+        return data.get("data", {}) if isinstance(data, dict) else data
 
     def refresh_token(self, url, payload) -> str:
         data = self._handle_request(method="POST", url=url, data=payload)
@@ -141,7 +141,8 @@ def fetch_data_with_args(args):
 
         params["from"] += params["limit"]
 
-    CacheManager.save(all_data, CACHE_FILE)
+    if all_data:
+        CacheManager.save(all_data, CACHE_FILE)
 
     return all_data
 
