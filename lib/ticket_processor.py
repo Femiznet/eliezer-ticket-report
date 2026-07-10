@@ -1,7 +1,7 @@
 import json
 from collections import defaultdict
 from pydantic import ValidationError
-from lib.ticket_model import TicketModel 
+from ticket_model import TicketModel 
 from bs4 import BeautifulSoup
 
 def _clean_html(html_content: str) -> str:

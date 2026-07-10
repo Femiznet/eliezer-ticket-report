@@ -12,7 +12,7 @@ def get_args():
 
     args.status = args.status.strip().lower()
     if args.status not in {"open", "closed"}:
-        parser.error("Status must either be 'open or closed'")
+        parser.error("Status must either 'open or closed'")
 
     # Use dateparser to handle flexible formats automatically
     args.from_date = dateparser.parse(args.from_date)
@@ -26,4 +26,4 @@ def get_args():
 if __name__ == "__main__":
     args = get_args()
     print(f"Fetching tickets with status: {args.status}")
-    print(f"Date range: {args.from_date.strftime('%Y-%m-%d')} to {args.to_date.strftime('%Y-%m-%d')}")
+    print(f"Date range: {args.from_date.strftime('%d %B %Y').replace(' 0', ' ')} to {args.to_date.strftime('%d %B %Y').replace(' 0', ' ')}")

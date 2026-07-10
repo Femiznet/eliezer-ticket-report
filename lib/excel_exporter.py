@@ -4,6 +4,8 @@ from datetime import datetime
 from openpyxl import load_workbook
 from openpyxl.utils import get_column_letter
 from openpyxl.styles import Alignment
+from utils import log_error
+from config import SAVE_TO_PATH
 
 def _prepare_dataframe(data: list[dict], status: str) -> pd.DataFrame:
     df = pd.DataFrame(data)
@@ -36,9 +38,10 @@ def _style_excel(file_path: str | Path):
             ws.column_dimensions[get_column_letter(i)].width = min(max(max_len + 2, 10), 50)
     wb.save(file_path)
 
-def export_tickets_to_excel(tickets: list[dict], assignee: str, status: str, base_folder: str = ".") -> Path:
+def _export_tickets_to_excel(tickets: list[dict], assignee: str, status: str, base_folder: str = ".") -> Path:
     if not tickets:
-        raise ValueError("No data provided for export.")
+        log_error("No data provided for export.")
+        return
     
     df = _prepare_dataframe(tickets, status)
     
@@ -54,4 +57,15 @@ def export_tickets_to_excel(tickets: list[dict], assignee: str, status: str, bas
             group[selected_cols].to_excel(writer, sheet_name=str(category)[:31], index=False)
             
     _style_excel(file_path)
+
     return file_path
+
+def convert_to_excel(data:dict, args):
+
+    for each_owner in data:
+        _export_tickets_to_excel(
+            tickets=data[each_owner],
+            assignee=each_owner,
+            status=args.status,
+            base_folder=SAVE_TO_PATH,
+        )

@@ -1,5 +1,5 @@
 import logging
-from lib import config
+import config
 from pathlib import Path
 
 # Set up the base configuration
@@ -23,17 +23,20 @@ def log_error(message, error=None):
     else:
         logger.error(message)
 
-def get_auth_token(file_path: str) -> str:
-    path = Path(file_path)
-    path.touch(exist_ok=True)
-
-    token = path.read_text().strip()
+def get_auth_token(file: str) -> str:
+    file = Path(file)
+    if not file.exists():
+        raise FileNotFoundError(f"{file} does not exists")
+    
+    token = file.read_text().strip()
+    if not token:
+        raise ValueError(f"File:{file} is empty")
     
     return token
 
-def save_token(token:str, file_path:str):
+def save_token(token:str, file:str):
     if not token:
-        log_error("Saving new token failed")
-        return
-    with open(file_path, "w") as file:
-        file.write(token.strip())
+        raise ValueError("cannot save an empty token")
+
+    with open(file, "w") as f:
+        f.write(token)

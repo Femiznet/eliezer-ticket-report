@@ -26,7 +26,7 @@ TOKEN_FILE = "token.env"
 TOKEN_VAR = "AUTH_TOKEN"
 
 # FILE CONFIG
-CACHE_FILE = "cache/raw.json"
+CACHE_FILE = "raw.json"
 SAVE_TO_PATH = "tickets"
 ERROR_LOG_PATH = "log/error.log"
 
