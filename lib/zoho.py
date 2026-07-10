@@ -65,11 +65,8 @@ def _build_extraction_params(status: str, date_range: str, offset: int = 0) -> d
     }
 
 def _build_extraction_headers(auth_token: str, org_id:str=ORG_ID) -> dict:
-    stripped_auth_token = auth_token.strip()
-    if not stripped_auth_token:
-        raise ValueError("Missing or empty auth token")
     return {
-        "Authorization": f"Zoho-oauthtoken {stripped_auth_token}",
+        "Authorization": f"Zoho-oauthtoken {auth_token}",
         "orgId": org_id
     }
 

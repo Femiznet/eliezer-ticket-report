@@ -1,15 +1,12 @@
 from pathlib import Path
 
 def get_auth_token(file: str) -> str:
-    file = Path(file)
-    if not file.exists():
-        raise FileNotFoundError(f"{file} does not exists")
-    
-    token = file.read_text().strip()
-    if not token:
-        raise ValueError(f"File:{file} is empty")
-    
-    return token
+    filepath = Path(file)
+    if not filepath.exists():
+        filepath.touch(exist_ok=True)
+        return None
+
+    return filepath.read_text().strip()
 
 def save_token(token:str, file:str):
     if not token:
