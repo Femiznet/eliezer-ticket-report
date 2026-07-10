@@ -4,8 +4,8 @@ from datetime import datetime
 from openpyxl import load_workbook
 from openpyxl.utils import get_column_letter
 from openpyxl.styles import Alignment
-from utils import log_error
-from config import SAVE_TO_PATH
+from .logging_utils import log_error
+from .config import SAVE_TO_PATH
 
 def _prepare_dataframe(data: list[dict], status: str) -> pd.DataFrame:
     df = pd.DataFrame(data)
@@ -61,11 +61,18 @@ def _export_tickets_to_excel(tickets: list[dict], assignee: str, status: str, ba
     return file_path
 
 def convert_to_excel(data:dict, args):
+    saved = {}
 
     for each_owner in data:
-        _export_tickets_to_excel(
+        saved_to = _export_tickets_to_excel(
             tickets=data[each_owner],
             assignee=each_owner,
             status=args.status,
             base_folder=SAVE_TO_PATH,
         )
+
+        saved[each_owner] = saved_to
+
+    return saved
+
+

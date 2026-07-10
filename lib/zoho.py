@@ -1,10 +1,12 @@
 import requests
-from utils import log_error, save_token, get_auth_token
-from config import (
+from .logging_utils import log_error
+from .token_utils import save_token, get_auth_token
+from .config import (
     ZOHO_DESK_URL, ZOHO_REFRESH_URL, 
-    ORG_ID, TOKEN_FILE, CACHE_FILE
+    ORG_ID, TOKEN_FILE, CACHE_FILE,
+    REFRESH_TOKEN, CLIENT_ID, CLIENT_SECRET
     )
-from cache_manager import CacheManager
+from .cache_manager import CacheManager
 
 class ZohoAPI:
     def __init__(self, timeout=10):
@@ -52,7 +54,7 @@ class ZohoAPI:
         self.session.close()
 
 
-def _build_extraction_params(status: str, date_range: tuple[str], offset: int = 0) -> dict:
+def _build_extraction_params(status: str, date_range: str, offset: int = 0) -> dict:
     status_lower = status.lower()
     time_key = "createdTimeRange" if status_lower == "open" else "modifiedTimeRange"
     return {
@@ -90,7 +92,7 @@ def fetch_data_with_args(args):
 
     params = _build_extraction_params(
         status=args.status,
-        date_range=(args.from_date, args.to_date),
+        date_range=args.from_date + "," + args.to_date, # join string with a ","
     )
 
     headers = _build_extraction_headers(
@@ -114,7 +116,12 @@ def fetch_data_with_args(args):
         if data == 401: # token expired
 
             # get a new token
-            refresh_payload = _build_refresh_payload()
+            refresh_payload = _build_refresh_payload(
+                ref_token=REFRESH_TOKEN,
+                client_id=CLIENT_ID,
+                client_secret=CLIENT_SECRET,
+            )
+
             new_token = zoho_api.refresh_token(
                 url=ZOHO_REFRESH_URL,
                 payload=refresh_payload,
@@ -128,6 +135,8 @@ def fetch_data_with_args(args):
                 org_id=ORG_ID,
             )
 
+            continue
+
         all_data.extend(data) # add new data's incrementally to existing data
 
         if len(data) < params["limit"]: # stop if the data size is lesser than what we want
@@ -138,8 +147,4 @@ def fetch_data_with_args(args):
     CacheManager.save(all_data, CACHE_FILE)
 
     return all_data
-
-
-    
-
 

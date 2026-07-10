@@ -1,7 +1,7 @@
 import json
 from collections import defaultdict
 from pydantic import ValidationError
-from ticket_model import TicketModel 
+from .ticket_model import TicketModel 
 from bs4 import BeautifulSoup
 
 def _clean_html(html_content: str) -> str:
@@ -30,13 +30,3 @@ def process_tickets(tickets_data: list[dict], target_owners:set|None = None):
             print(f"Skipping ticket due to error: {e}")
             
     return dict(grouped_tickets)
-
-
-if __name__ == "__main__":
-    with open('raw.json', 'r') as f:
-        data = json.load(f)
-
-    results = process_tickets(data, target_owners={"mayowa ajuwon", "olawunmi abiodun"})
-
-    with open('test.json', "w") as t:
-        json.dump(results, t, indent=2)

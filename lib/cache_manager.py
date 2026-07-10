@@ -1,6 +1,6 @@
 import json
 from pathlib import Path
-import utils
+from .logging_utils import log_error
 
 class CacheManager:
     _cachePath = Path("cache")
@@ -13,16 +13,13 @@ class CacheManager:
 
         try:
             if file_suffix.lower() != ".json":
-                utils.logError(f"Unsupported extension: {file_suffix}. Only .json allowed.")
+                log_error(f"Unsupported extension: {file_suffix}. Only .json allowed.")
                 return
-            
-            # Ensure folder (cache/) exists before writing
-            filepath.mkdir(parents=True, exist_ok=True)
-            
+                        
             with filepath.open("w") as f:
                 json.dump(data, f, indent=2)
         except Exception as e:
-            utils.logError("Saving cache failed", e)
+            log_error("Saving cache failed", e)
 
     @classmethod
     def load(cls, file:str) -> list:
@@ -31,9 +28,6 @@ class CacheManager:
             with filepath.open() as f:
                 return json.load(f)
         except Exception as e:
-            utils.log_error("Loading cache failed", e)
+            log_error("Loading cache failed", e)
 
         return []
-
-if __name__ == "__main__":
-    CacheManager().save({"femi":"boy"})
